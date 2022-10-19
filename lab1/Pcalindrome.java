@@ -2,7 +2,8 @@ public class Pcalindrome {
     public static void main(String[] args) {
         for (int i = 0; i < args.length; i++) {
             String s = args[i];
-            System.out.println(reverseString(s) + ' ' + isPalindrome(s));
+            if (isPalindrome(s) == true)
+                System.out.println(reverseString(s) + ' ' + isPalindrome(s));
         }
     }
 
