@@ -1,18 +1,8 @@
-package task;
 
 public class Task1 {
     public static void main(String[] args) {
-        System.out.println(del(4, 10));
-        System.out.println(squareTr(5, 6));
-        System.out.println(anim(3, 4, 5));
-        System.out.println(checkDelC(5, 6, 7));
-        System.out.println(checkRes(3, 1, 2));
-        System.out.println(checkRes1(1, 2, 3));
-        System.out.println(returnNum('F'));
-        System.out.println(returnSum(5));
-        System.out.println(maxLengthTr(11, 12));
-        // System.out.println(sumKub(1,2,3,4));
-        System.out.println(checkDelC(5, 6, 11));
+        System.out.println(returnNum(' '));
+
     }
 
     public static int del(int a, int b) {

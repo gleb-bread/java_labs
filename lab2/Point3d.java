@@ -1,20 +1,12 @@
-public class Point3d {
-    public static void main(String[] args) {
-        Point3d num1 = new Point3d(1, 2, 3);
-        Point3d num2 = new Point3d(0, 5, 1);
-        Point3d num3 = new Point3d(11.88, 22.56, 16.3);
-        String str = checkPoints(num1, num2);
-        System.out.println(str);
-        System.out.println("Растояние между двумя точками равно = " + String.format("%.2f", num1.distanceTo(num3)));
-    }
+
+public class Point3d extends Point2d {
 
     private double xCoord;
     private double yCoord;
     private double zCoord;
 
     public Point3d(double x, double y, double z) {
-        xCoord = x;
-        yCoord = y;
+        super(x, y);
         zCoord = z;
     }
 
@@ -22,24 +14,8 @@ public class Point3d {
         this(0, 0, 0);
     }
 
-    public double getX() {
-        return xCoord;
-    }
-
-    public double getY() {
-        return yCoord;
-    }
-
     public double getZ() {
         return zCoord;
-    }
-
-    public void setX(double val) {
-        xCoord = val;
-    }
-
-    public void setY(double val) {
-        yCoord = val;
     }
 
     public void setZ(double val) {

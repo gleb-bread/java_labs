@@ -1,26 +1,39 @@
+import java.util.Scanner;
+
 public class Lab1 {
 
     public static void main(String[] args) {
-        String str = "";
-        double[] arr = new double[9];
-        int j = 0;
-        for (int i = 0; i < args.length; i++) {
-            str += args[i];
-            arr[j] = (str.charAt(0));
-            j += 1;
-            arr[j] = str.charAt(1);
-            j += 1;
-            arr[j] = str.charAt(2);
-            j += 1;
-            str = "";
-        }
-        Point3d num1 = new Point3d(arr[0], arr[1], arr[2]);
-        Point3d num2 = new Point3d(arr[3], arr[4], arr[5]);
-        Point3d num3 = new Point3d(arr[6], arr[7], arr[8]);
-        if (checkPoints(num1, num2, num3) == false)
-            System.out.println("У вас совпадают точки");
+        Scanner scn = new Scanner(System.in);
+        Point3d coord1 = new Point3d();
+        Point3d coord2 = new Point3d();
+        Point3d coord3 = new Point3d();
+        System.out.println("Введите координаты Х для 1 точки:");
+        coord1.setX(scn.nextDouble());
+        System.out.println("Введите координаты Y для 1 точки:");
+        coord1.setY(scn.nextDouble());
+        System.out.println("Введите координаты Z для 1 точки:");
+        coord1.setZ(scn.nextDouble());
+
+        System.out.println("Введите координаты Х для 2 точки:");
+        coord2.setX(scn.nextDouble());
+        System.out.println("Введите координаты Y для 2 точки:");
+        coord2.setY(scn.nextDouble());
+        System.out.println("Введите координаты Z для 2 точки:");
+        coord2.setZ(scn.nextDouble());
+
+        System.out.println("Введите координаты Х для 3 точки:");
+        coord3.setX(scn.nextDouble());
+        System.out.println("Введите координаты Y для 3 точки:");
+        coord3.setY(scn.nextDouble());
+        System.out.println("Введите координаты Z для 3 точки:");
+        coord3.setZ(scn.nextDouble());
+        scn.close();
+        System.out.println(String.format("%.2f", coord1.distanceTo(coord2)));
+        if (!(checkPoints(coord1, coord2, coord3) == false))
+            System.out.println(computeArea(coord1, coord2, coord3));
         else
-            System.out.println("Площадь треугольника равна " + computeArea(num1, num2, num3));
+            System.out.println("Координаты одинаковы");
+
     }
 
     public static double computeArea(Point3d num1, Point3d num2, Point3d num3) {
