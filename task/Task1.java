@@ -1,7 +1,7 @@
 
 public class Task1 {
     public static void main(String[] args) {
-        System.out.println(returnNum(' '));
+        System.out.println(returnNum('0'));
 
     }
 
