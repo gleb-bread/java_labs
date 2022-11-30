@@ -3,15 +3,7 @@ public class Task2 {
         int[] arr1 = new int[] { 1, 2, 3, 4, 5, 6, 7, 8 };
         System.out.println(repeat("erterteter", 6));
         System.out.println(differensMaxMin(arr1));
-        System.out.println(isAvgWhole(arr1));
         System.out.println(cumulativeSum(arr1));
-        System.out.println(getDecimalPlaces("43.20"));
-        System.out.println(Fibonacci(3));
-        System.out.println(isValid("393939"));
-        System.out.println(isStrangePair("", "hubris"));
-        System.out.println(isPrefix("automation", "auto-"));
-        System.out.println(isSuffix("arachnophobia", "-phobia"));
-        System.out.println(BoxSeq(1));
     }
 
     public static String repeat(String str0, int n) {
@@ -77,26 +69,19 @@ public class Task2 {
 
     }
 
-    public static boolean isValid(String code) {
-        if (code.matches("[0-9]+")) {
-            if (code.length() == 5) {
-                for (int i = 0; i < code.length(); i++) {
-                    if (code.charAt(i) == ' ') {
-                        return false;
-                    }
-                }
-                return true;
-            } else {
-                return false;
-            }
-        } else {
-            return false;
-        }
-    }
+    // public static boolean isValid(String str) {
+    // for (int i = 0; i< str.length; i++){
+    // if (str[i] == " "){
+
+    // }
+    // }
+    // if (str.matches("[0-9]+") && str.length() == 5 && result == true)
+    // return true;
+    // else
+    // return false;
+    // }
 
     private static boolean isStrangePair(String str1, String str2) {
-        if (str1.equals("") || str2.equals(""))
-            return false;
         if (str1.charAt(0) == str2.charAt(str2.length() - 1) && str1.charAt(str1.length() - 1) == str2.charAt(0))
             return true;
         else
@@ -108,17 +93,18 @@ public class Task2 {
         return wrd.startsWith(pref.substring(0, pref.length() - 2));
     }
 
-    private static boolean isSuffix(String wrd, String suf) {
-        return wrd.endsWith(suf.substring(1, suf.length() - 2));
+    private static boolean Suffix(String wrd, String suf) {
+
+        return wrd.endsWith(suf.substring(1, suf.length() - 1));
     }
 
-    private static int BoxSeq(int i) {
+    private static int BOXSP(int i) {
         if (i == 0) {
             return 0;
         } else if (i % 2 == 0) {
-            return BoxSeq(i - 1) - 1;
+            return BOXSP(i - 1) - 1;
         } else {
-            return BoxSeq(i - 1) + 3;
+            return BOXSP(i - 1) + 3;
         }
     }
 }

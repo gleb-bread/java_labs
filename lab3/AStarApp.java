@@ -1,227 +1,236 @@
-// import java.awt.*;
-// import java.awt.event.*;
-// import javax.swing.*;
 
-// /**
-// * A simple Swing application to demonstrate the A* pathfinding algorithm. The
-// * user is presented with a map, containing a start and end location. The user
-// * can draw or clear obstacles on the map, and then press a button to compute
-// a
-// * path from start to end using the A* pathfinding algorithm. If a path is
-// * found, it is displayed in green.
-// **/
-// public class AStarApp {
+import java.awt.*;
+import java.awt.event.*;
+import javax.swing.*;
 
-// /** The number of grid cells in the X direction. **/
-// private int width;
+/**
+ * Простое приложение Swing для демонстрации алгоритма поиска пути A *. То
+ * пользователю предоставляется карта, содержащая начальное и конечное
+ * местоположение. Пользователь
+ * может рисовать или устранять препятствия на карте, а затем нажимать кнопку
+ * для вычисления
+ * путь от начала до конца с использованием алгоритма поиска пути A*. Если путь
+ * найден, он отображается зеленым цветом.
+ **/
+public class AStarApp {
 
-// /** The number of grid cells in the Y direction. **/
-// private int height;
+    /** Количество ячеек сетки в направлении X. **/
+    private int width;
 
-// /** The location where the path starts from. **/
-// private Location startLoc;
+    /** Количество ячеек сетки в направлении Y. **/
+    private int height;
 
-// /** The location where the path is supposed to finish. **/
-// private Location finishLoc;
+    /** Местоположение, с которого начинается путь. **/
+    private Location startLoc;
 
-// /**
-// * This is a 2D array of UI components that provide display and manipulation
-// * of the cells in the map.
-// ***/
-// private JMapCell[][] mapCells;
+    /** Местоположение, где путь должен заканчиваться. **/
+    private Location finishLoc;
 
-// /**
-// * This inner class handles mouse events in the main grid of map cells, by
-// * modifying the cells based on the mouse button state and the initial edit
-// * that was performed.
-// **/
-// private class MapCellHandler implements MouseListener {
-// /**
-// * This value will be true if a mouse button has been pressed and we are
-// * currently in the midst of a modification operation.
-// **/
-// private boolean modifying;
+    /**
+     * Это 2D-массив компонентов пользовательского интерфейса, которые обеспечивают
+     * отображение и манипулирование
+     * из ячеек на карте.
+     ***/
+    private JMapCell[][] mapCells;
 
-// /**
-// * This value records whether we are making cells passable or
-// * impassable. Which it is depends on the original state of the cell
-// * that the operation was started within.
-// **/
-// private boolean makePassable;
+    /**
+     * Этот внутренний класс обрабатывает события мыши в основной сетке ячеек карты,
+     * изменяя ячейки на основе состояния кнопки мыши и первоначального
+     * редактирования.
+     * это было выполнено.
+     **/
+    private class MapCellHandler implements MouseListener {
+        /**
+         * Это значение будет истинным, если была нажата кнопка мыши, и мы
+         * в данный момент находимся в процессе модификации.
+         **/
+        private boolean modifying;
 
-// /** Initiates the modification operation. **/
-// public void mousePressed(MouseEvent e) {
-// modifying = true;
+        /**
+         * Это значение записывает, делаем ли мы ячейки проходимыми или
+         * непроходимый. Что это такое, зависит от исходного состояния ячейки
+         * что операция была начата внутри.
+         **/
+        private boolean makePassable;
 
-// JMapCell cell = (JMapCell) e.getSource();
+        // Инициирует операцию модификации.
+        public void mousePressed(MouseEvent e) {
+            modifying = true;
 
-// // If the current cell is passable then we are making them
-// // impassable; if it's impassable then we are making them passable.
+            JMapCell cell = (JMapCell) e.getSource();
 
-// makePassable = !cell.isPassable();
+            // Если текущая ячейка проходима, то мы делаем их
+            // непроходимыми; если она непроходима, то мы делаем их проходимыми.
 
-// cell.setPassable(makePassable);
-// }
+            makePassable = !cell.isPassable();
 
-// /** Ends the modification operation. **/
-// public void mouseReleased(MouseEvent e) {
-// modifying = false;
-// }
+            cell.setPassable(makePassable);
+        }
 
-// /**
-// * If the mouse has been pressed, this continues the modification
-// * operation into the new cell.
-// **/
-// public void mouseEntered(MouseEvent e) {
-// if (modifying) {
-// JMapCell cell = (JMapCell) e.getSource();
-// cell.setPassable(makePassable);
-// }
-// }
+        /** Завершает операцию модификации. **/
+        public void mouseReleased(MouseEvent e) {
+            modifying = false;
+        }
 
-// /** Not needed for this handler. **/
-// public void mouseExited(MouseEvent e) {
-// // This one we ignore.
-// }
+        /**
+         * Если мышь была нажата, это продолжает модификацию
+         * операция в новой ячейке.
+         **/
+        public void mouseEntered(MouseEvent e) {
+            if (modifying) {
+                JMapCell cell = (JMapCell) e.getSource();
+                cell.setPassable(makePassable);
+            }
+        }
 
-// /** Not needed for this handler. **/
-// public void mouseClicked(MouseEvent e) {
-// // And this one too.
-// }
-// }
+        /** Не требуется для этого обработчика. **/
+        public void mouseExited(MouseEvent e) {
+            // This one we ignore.
+        }
 
-// /**
-// * Creates a new instance of AStarApp with the specified map width and
-// * height.
-// **/
-// public AStarApp(int w, int h) {
-// if (w <= 0)
-// throw new IllegalArgumentException("w must be > 0; got " + w);
+        // Не требуется для этого обработчика.
+        public void mouseClicked(MouseEvent e) {
+            // И этот тоже.
+        }
+    }
 
-// if (h <= 0)
-// throw new IllegalArgumentException("h must be > 0; got " + h);
+    /**
+     * * Создает новый экземпляр приложения Star с указанной шириной карты и
+     * высотой *.
+     **/
+    public AStarApp(int w, int h) {
+        if (w <= 0)
+            throw new IllegalArgumentException("w must be > 0; got " + w);
 
-// width = w;
-// height = h;
+        if (h <= 0)
+            throw new IllegalArgumentException("h must be > 0; got " + h);
 
-// startLoc = new Location(2, h / 2);
-// finishLoc = new Location(w - 3, h / 2);
-// }
+        width = w;
+        height = h;
 
-// /**
-// * Simple helper method to set up the Swing user interface. This is called
-// * from the Swing event-handler thread to be threadsafe.
-// **/
-// private void initGUI() {
-// JFrame frame = new JFrame("Pathfinder");
-// frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-// Container contentPane = frame.getContentPane();
+        startLoc = new Location(2, h / 2);
+        finishLoc = new Location(w - 3, h / 2);
+    }
 
-// contentPane.setLayout(new BorderLayout());
+    /**
+     * Простой вспомогательный метод для настройки пользовательского интерфейса
+     * Swing. Это называется
+     * из потока обработчика событий Swing, чтобы быть потокобезопасным.
+     **/
+    private void initGUI() {
+        JFrame frame = new JFrame("Pathfinder");
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        Container contentPane = frame.getContentPane();
 
-// // Use GridBagLayout because it actually respects the preferred size
-// // specified by the components it lays out.
+        contentPane.setLayout(new BorderLayout());
 
-// GridBagLayout gbLayout = new GridBagLayout();
-// GridBagConstraints gbConstraints = new GridBagConstraints();
-// gbConstraints.fill = GridBagConstraints.BOTH;
-// gbConstraints.weightx = 1;
-// gbConstraints.weighty = 1;
-// gbConstraints.insets.set(0, 0, 1, 1);
+        // Используйте GridBagLayout, потому что он действительно учитывает
+        // предпочтительный размер
+        // определяется компонентами, которые он содержит.
 
-// JPanel mapPanel = new JPanel(gbLayout);
-// mapPanel.setBackground(Color.GRAY);
+        GridBagLayout gbLayout = new GridBagLayout();
+        GridBagConstraints gbConstraints = new GridBagConstraints();
+        gbConstraints.fill = GridBagConstraints.BOTH;
+        gbConstraints.weightx = 1;
+        gbConstraints.weighty = 1;
+        gbConstraints.insets.set(0, 0, 1, 1);
 
-// mapCells = new JMapCell[width][height];
+        JPanel mapPanel = new JPanel(gbLayout);
+        mapPanel.setBackground(Color.GRAY);
 
-// MapCellHandler cellHandler = new MapCellHandler();
+        mapCells = new JMapCell[width][height];
 
-// for (int y = 0; y < height; y++) {
-// for (int x = 0; x < width; x++) {
-// mapCells[x][y] = new JMapCell();
+        MapCellHandler cellHandler = new MapCellHandler();
 
-// gbConstraints.gridx = x;
-// gbConstraints.gridy = y;
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                mapCells[x][y] = new JMapCell();
 
-// gbLayout.setConstraints(mapCells[x][y], gbConstraints);
+                gbConstraints.gridx = x;
+                gbConstraints.gridy = y;
 
-// mapPanel.add(mapCells[x][y]);
-// mapCells[x][y].addMouseListener(cellHandler);
-// }
-// }
+                gbLayout.setConstraints(mapCells[x][y], gbConstraints);
 
-// contentPane.add(mapPanel, BorderLayout.CENTER);
+                mapPanel.add(mapCells[x][y]);
+                mapCells[x][y].addMouseListener(cellHandler);
+            }
+        }
 
-// JButton findPathButton = new JButton("Find Path");
-// findPathButton.addActionListener(new ActionListener() {
-// public void actionPerformed(ActionEvent e) {
-// findAndShowPath();
-// }
-// });
+        contentPane.add(mapPanel, BorderLayout.CENTER);
 
-// contentPane.add(findPathButton, BorderLayout.SOUTH);
+        JButton findPathButton = new JButton("Find Path");
+        findPathButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                findAndShowPath();
+            }
+        });
 
-// frame.pack();
-// frame.setVisible(true);
+        contentPane.add(findPathButton, BorderLayout.SOUTH);
 
-// mapCells[startLoc.xCoord][startLoc.yCoord].setEndpoint(true);
-// mapCells[finishLoc.xCoord][finishLoc.yCoord].setEndpoint(true);
-// }
+        frame.pack();
+        frame.setVisible(true);
 
-// /** Kicks off the application. Called from the {@link #main} method. **/
-// private void start() {
-// SwingUtilities.invokeLater(new Runnable() {
-// public void run() {
-// initGUI();
-// }
-// });
-// }
+        mapCells[startLoc.xCoord][startLoc.yCoord].setEndpoint(true);
+        mapCells[finishLoc.xCoord][finishLoc.yCoord].setEndpoint(true);
+    }
 
-// /**
-// * This helper method attempts to compute a path using the current map
-// * state. The implementation is rather slow; a new {@link Map2D} object is
-// * created, and initialized from the current application state. Then the A*
-// * pathfinder is called, and if a path is found, the display is updated to
-// * show the path that was found. (A better solution would use the Model
-// * View Controller design pattern.)
-// **/
-// private void findAndShowPath() {
-// // Create a Map2D object containing the current state of the user input.
+    /** Запускает приложение. Вызывается из метода {@link #main}. **/
+    private void start() {
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                initGUI();
+            }
+        });
+    }
 
-// Map2D map = new Map2D(width, height);
-// map.setStart(startLoc);
-// map.setFinish(finishLoc);
+    /**
+     * Этот вспомогательный метод пытается вычислить путь, используя текущую карту
+     * государство. Реализация довольно медленная; создается новый объект
+     * {@link Map2D}
+     * и инициализируется из текущего состояния приложения. Затем А*
+     * вызывается навигатор, и если путь найден, дисплей обновляется до
+     * показывать найденный путь. (Лучшим решением было бы использовать модель
+     * Просмотр шаблона проектирования контроллера.)
+     **/
+    private void findAndShowPath() {
+        // Создайте 2D-объект карты, содержащий текущее состояние пользовательского
+        // ввода.
 
-// for (int y = 0; y < height; y++) {
-// for (int x = 0; x < width; x++) {
-// mapCells[x][y].setPath(false);
+        Map2D map = new Map2D(width, height);
+        map.setStart(startLoc);
+        map.setFinish(finishLoc);
 
-// if (mapCells[x][y].isPassable())
-// map.setCellValue(x, y, 0);
-// else
-// map.setCellValue(x, y, Integer.MAX_VALUE);
-// }
-// }
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                mapCells[x][y].setPath(false);
 
-// // Try to compute a path. If one can be computed, mark all cells in the
-// // path.
+                if (mapCells[x][y].isPassable())
+                    map.setCellValue(x, y, 0);
+                else
+                    map.setCellValue(x, y, Integer.MAX_VALUE);
+            }
+        }
 
-// Waypoint wp = AStarPathfinder.computePath(map);
+        // Попробуйте вычислить путь. Если один из них может быть вычислен, отметьте все
+        // ячейки в пути //.
 
-// while (wp != null) {
-// Location loc = wp.getLocation();
-// mapCells[loc.xCoord][loc.yCoord].setPath(true);
+        Waypoint wp = AStarPathfinder.computePath(map);
 
-// wp = wp.getPrevious();
-// }
-// }
+        while (wp != null) {
+            Location loc = wp.getLocation();
+            mapCells[loc.xCoord][loc.yCoord].setPath(true);
 
-// /**
-// * Entry-point for the application. No command-line arguments are
-// * recognized at this time.
-// **/
-// public static void main(String[] args) {
-// AStarApp app = new AStarApp(40, 30);
-// app.start();
-// }
-// }
+            wp = wp.getPrevious();
+        }
+    }
+
+    /**
+     * Точка входа для приложения. В настоящее время никакие аргументы командной
+     * строки
+     * не распознаются.
+     **/
+    public static void main(String[] args) {
+        AStarApp app = new AStarApp(40, 30);
+        app.start();
+    }
+}

@@ -1,195 +1,242 @@
+import java.util.HashSet;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import static java.lang.Math.pow;
+import java.util.Arrays;
+
 public class Task3 {
     public static void main(String[] args) {
-        int[] arr1 = new int[] { 1, 3, 4, 4, 4, 5 };
-        int[] arr2 = new int[] { 2, 5, 7 };
+
+        System.out.println("Первое");
+        System.out.println(solutions(1, 0, -1));
         System.out.println(solutions(1, 0, 0));
-        System.out.println(FindZip("all zip files are zipped")); // no
+        System.out.println(solutions(1, 0, 1));
+
+        System.out.println("Второе");
+        System.out.println(findZip("all zip files are zipped"));
+        System.out.println(findZip("all zip files are compressed"));
+
+        System.out.println("Третье");
         System.out.println(checkPerfect(6));
+        System.out.println(checkPerfect(12));
+
+        System.out.println("Четвёртое");
         System.out.println(flipEndChars("Cat, dog, and mouse."));
+        System.out.println(flipEndChars("Ada"));
+        System.out.println(flipEndChars("z"));
+
+        System.out.println("Пятое");
         System.out.println(isValidHexCode("#CD5C5C"));
-        System.out.println(same(arr1, arr2));
-        // System.out.println(isKaprekar(3));
-        System.out.println(longestZero("01100001011000")); // no
-        // System.out.println(nextPrime(12));
-        System.out.println(rightTriangle(70, 130, 110)); // ok
+        System.out.println(isValidHexCode("#EAECEE"));
+        System.out.println(isValidHexCode("#eaecee"));
+        System.out.println(isValidHexCode("#CD5C58C"));
+
+        System.out.println("Шестое");
+        System.out.println(same(new int[] { 1, 3, 4, 4, 4 }, new int[] { 2, 5, 7 }));
+        System.out.println(same(new int[] { 9, 8, 7, 6 }, new int[] { 4, 4, 3, 1 }));
+        System.out.println(same(new int[] { 2 }, new int[] { 3, 3, 3, 3, 3 }));
+
+        System.out.println("Седьмое");
+        System.out.println(isKaprekar(3));
+        System.out.println(isKaprekar(5));
+        System.out.println(isKaprekar(297));
+
+        System.out.println("Восьмое");
+        System.out.println(longestZero("01100001011000"));
+        System.out.println(longestZero("100100100"));
+        System.out.println(longestZero("11111"));
+
+        System.out.println("Девятое");
+        System.out.println(nextPrime(12));
+        System.out.println(nextPrime(24));
+        System.out.println(nextPrime(11));
+
+        System.out.println("Десятое");
+        System.out.println(rightTriangle(3, 4, 5));
+        System.out.println(rightTriangle(145, 105, 100));
+        System.out.println(rightTriangle(70, 130, 110));
     }
 
-    public static int solutions(double a, double b, double c) {
-        if (Math.pow(b, 2) - 4 * a * c < 0) {
-            return 0;
-        } else if (Math.pow(b, 2) - 4 * a * c == 0) {
+    private static int solutions(int a, int b, int c) {
+
+        int d = b * b - 4 * a * c;
+
+        if (d == 0) {
             return 1;
-        } else
+        } else if (d > 0) {
             return 2;
+        } else {
+            return 0;
+        }
     }
 
-    public static int FindZip(String str) {
-        int count = 0;
-        int index = -1;
-        for (int i = 1; i < str.length() - 1; i++) {
-            String smallstr = "";
-            smallstr += str.charAt(i - 1) + str.charAt(i) + str.charAt(i);
-            if (smallstr.toLowerCase() == "zip" && count == 0) {
-                count++;
-            } else if (smallstr.toLowerCase() == "zip" && count < 2) {
-                index = i - 1;
-                return index;
+    private static int findZip(String str) {
+        Pattern pattern = Pattern.compile("zip"); // создаём объект класса Pattern. Принимаем аргумент
+        Matcher matcher = pattern.matcher(str); // ищет соответствие шаблона
+        // количество найденных последовательностей 'zip'
+        int foundOccurrence = 0;
+        while (matcher.find() && foundOccurrence < 2) { // ищем в строке последовательность
+            // если это второе вхождение, то возвращается его позиция
+            if (foundOccurrence == 1) {
+                return matcher.start(); // используем для получения стартового индекс
+            }
+            foundOccurrence += 1;
+        }
+        return -1;
+    }
+
+    public static boolean checkPerfect(int n) {
+        int sum = 0;
+        for (int i = 1; i < n; i++) {
+            if (n % i == 0) {
+                sum += i;
             }
         }
-        return index;
-    }
-
-    public static boolean checkPerfect(int num) {
-        int num1 = 0;
-        for (int i = 1; i < num; i++) {
-            num1 += i;
-        }
-        if (num1 != num)
-            return false;
-        else
+        if (sum == n)
             return true;
+        return false;
     }
 
-    public static String flipEndChars(String str) {
-        String str1 = "";
-        str1 += str.charAt(0);
-        if (str.length() <= 2)
-            return "Incompatible.";
-        else if (str.charAt(0) == str.charAt(str.length() - 1))
-            return "Two's a pair.";
-        for (int i = 1; i < str.length() - 1; i++) {
-            str1 += str.charAt(i);
+    private static String flipEndChars(String s) {
+        if (s.equals("")) {
+            return "incompatible";
         }
-        str1 += str.charAt(str.length() - 1);
-        return str1;
+        if (s.length() < 2) {
+            return "incompatible";
+        } else if (s.charAt(0) == s.charAt(s.length() - 1)) {
+            return "Two's a pair";
+        } else {
+            return s.charAt(s.length() - 1) +
+                    s.substring(1, s.length() - 1) +
+                    s.charAt(0);
+        }
     }
 
-    public static boolean isValidHexCode(String str) {
-        if (str.charAt(0) != '#') {
-            return false;
-        }
-        for (int i = 1; i < str.length(); i++) {
-            int numOfSymbol = str.charAt(i);
-            if (numOfSymbol < 48 && numOfSymbol > 70) {
-                if (numOfSymbol > 57 && numOfSymbol < 65) {
+    private static boolean isValidHexCode(String hex) {
+        {
+            if (hex.charAt(0) != '#')
+                return false;
+
+            if (!(hex.length() == 7))
+                return false;
+
+            for (int i = 1; i < hex.length(); i++)
+                if (!((hex.charAt(i) >= '0' && hex.charAt(i) <= '9')
+                        || (hex.charAt(i) >= 'a' && hex.charAt(i) <= 'f')
+                        || (hex.charAt(i) >= 'A' || hex.charAt(i) <= 'F')))
                     return false;
-                }
-            }
-        }
-        return true;
-    }
-
-    public static boolean same(int[] arr1, int[] arr2) {
-        int count0 = 0;
-        int count1 = 0;
-        int count2 = 0;
-        int[] arr3 = new int[arr1.length];
-        for (int i = 0; i < arr1.length; i++) {
-            arr3[i] = arr1[i];
-            for (int j = 0; j < arr3.length; j++) {
-                if (arr3[i] == arr1[i]) {
-                    count0++;
-                }
-            }
-            if (count0 == 1) {
-                count1++;
-            }
-        }
-        count0 = 0;
-        for (int i = 0; i < arr2.length; i++) {
-            arr3[i] = arr2[i];
-            for (int j = 0; j < arr3.length; j++) {
-                if (arr3[i] == arr2[i]) {
-                    count0++;
-                }
-            }
-            if (count0 == 1) {
-                count2++;
-            }
-        }
-        if (count1 == count2)
             return true;
-        else
-            return false;
+        }
     }
 
-    public static boolean isKaprekar(int num) {
-        double left = 0;
-        double n = Math.pow(num, 2);
-        String str = "";
-        String leftNum = "";
-        String rightNum = "";
-        str += n;
-        left = Math.floor(str.length() / 2);
-        for (int i = 0; i < left; i++) {
-            leftNum += str.charAt(i);
+    private static boolean same(int[] a, int[] b) {
+        return build(a).size() == build(b).size();
+    }
+
+    private static Set<Integer> build(int[] array) {
+        Set<Integer> s = new HashSet<>();
+        for (int c : array) {
+            s.add(c);
         }
-        for (int i = (int) left - 1; i < str.length(); i++) {
-            rightNum += str.charAt(i);
+        return s;
+    }
+
+    static boolean isKaprekar(int n) {
+
+        boolean isCapricorn = false;
+
+        int square = n * n;
+        int temp = square;
+        int contDigits = 0;
+
+        while (temp > 0) {
+            contDigits++;
+            temp /= 10;
         }
-        int sum = Integer.parseInt(leftNum) + Integer.parseInt(rightNum);
-        if (sum == num) {
+
+        int divisor = (int) Math.pow(10, (contDigits / 2 + 1));
+        int quotient = square / divisor; // делим на
+        int remainder = square % divisor;
+        if (quotient + remainder == n) {
+            isCapricorn = true;
+        }
+
+        if (isCapricorn) {
             return true;
         } else {
             return false;
         }
     }
 
-    public static String longestZero(String str) {
-        int count = 0;
-        int max = 0;
-        int index = 0;
-        String str2 = "";
-        for (int i = 0; i < str.length(); i++) {
-            if (str.charAt(i) == '0') {
-                count++;
+    private static String longestZero(String str) {
+        // максимальная найденная последовательность нулей
+        int maxLength = 0;
+        // текущая последовательность нулей
+        int currentLength = 0;
+        // Перебираем символы в строке
+        for (char ch : str.toCharArray()) {
+            // если сейчас не 0, то сбрасыываем найденное количество нулей
+            if (ch != '0') {
+                currentLength = 0;
             } else {
-                if (count > max) {
-                    max = count;
-                    index = i;
-                }
-                count = 0;
+                currentLength += 1;
+            }
+            // если текущее количество нулей больше максимального - перезаписываем
+            if (currentLength > maxLength) {
+                maxLength = currentLength;
             }
         }
-        if (max == 0) {
-            return str2;
-        } else {
-            for (int i = 0; i < max; i++) {
-                str2 += str.charAt(index - i);
-            }
+        String str0 = "";
+        for (int i = 0; i < maxLength; i++) {
+            str0 += "0";
         }
-        return str2;
+        return str0;
     }
 
-    public static int nextPrime(int num) {
-        for (int i = 2; i < num; i++) {
-            if ((num % i) == 0)
-                nextPrime(num++);
+    private static int nextPrime(int d) {
+        class PrimeChecker {
+            boolean isPrime(int number) {
+                // проверяем что на промежутке от 2 до корня числа нет его множителей.
+                // если это так - то оно простое
+                for (int i = 2; i <= Math.sqrt(number); i++) {
+                    if (number % i == 0) {
+                        return false;
+                    }
+                }
+                return true;
+            }
         }
-        return num;
+        PrimeChecker checker = new PrimeChecker(); // выделяем память
+        // ищем среди заданного числа и следующих за ним простое.
+        while (true) {
+            if (checker.isPrime(d)) {
+                return d;
+            }
+            d++;
+        }
     }
 
     public static boolean rightTriangle(int a, int b, int c) {
-        double max = a;
-        int index = 1;
-        if (max < b) {
-            max = b;
-            index = 2;
+        int[] numbers = new int[3];
+
+        numbers[0] = a;
+        numbers[1] = b;
+        numbers[2] = c;
+
+        // с начала нужно отсортировать эти числа (x, y, z)
+        // в порядке возрастания
+        Arrays.sort(numbers);
+
+        // теперь проверяем являются ли эти числа тройкой Пифагора
+        // по формуле: x^2 + y^2 = z^2
+        // и выводим ответ
+        if ((pow(numbers[0], 2) + pow(numbers[1], 2)) == pow(numbers[2], 2)) {
+            return true;
+        } else {
+            return false;
         }
 
-        if (max < c) {
-            max = c;
-            index = 3;
-        }
-        if ((Math.pow(max, 2) == Math.pow(b, 2) + Math.pow(c, 2)) && index == 1) {
-            return true;
-        }
-        if ((Math.pow(max, 2) == Math.pow(a, 2) + Math.pow(c, 2)) && index == 2) {
-            return true;
-        }
-        if ((Math.pow(max, 2) == Math.pow(b, 2) + Math.pow(a, 2)) && index == 3) {
-            return true;
-        }
-        return false;
     }
+
 }

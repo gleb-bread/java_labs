@@ -1,256 +1,143 @@
-// package lab3;
 
-// package com.telmomenezes.drmap;
+/**
+ * Этот класс представляет собой простую двумерную карту, состоящую из
+ * квадратных ячеек.
+ * В каждой ячейке указывается стоимость обхода этой ячейки.
+ **/
+public class Map2D {
+    /** Ширина карты. **/
+    private int width;
 
-// import java.util.Arrays;
+    /** Высота карты. **/
+    private int height;
 
-// import com.telmomenezes.drmap.Feature2D;
-// import com.telmomenezes.drmap.JFastEMD;
-// import com.telmomenezes.drmap.Signature;
+    /**
+     * Фактические картографические данные, необходимые алгоритму поиска пути для
+     * навигации.
+     **/
+    private int[][] cells;
 
-// public class Map2D {
-// protected double[] data;
-// protected int binNumber;
-// protected double minValHor;
-// protected double maxValHor;
-// protected double minValVer;
-// protected double maxValVer;
+    /** Начальное местоположение для выполнения поиска пути A*. **/
+    private Location start;
 
-// public Map2D(int binNumber) {
-// this.binNumber = binNumber;
-// this.data = new double[binNumber * binNumber];
+    /** Конечное местоположение для выполнения поиска пути A*. **/
+    private Location finish;
 
-// clear();
-// }
+    /** Создает новую 2D-карту с заданными шириной и высотой. **/
+    public Map2D(int width, int height) {
+        if (width <= 0 || height <= 0) {
+            throw new IllegalArgumentException(
+                    "width and height must be positive values; got " + width +
+                            "x" + height);
+        }
 
-// public void clear() {
-// Arrays.fill(getData(), 0);
-// }
+        this.width = width;
+        this.height = height;
 
-// public void setValue(int x, int y, double val) {
-// getData()[(y * binNumber) + x] = val;
-// }
+        cells = new int[width][height];
 
-// public void incValue(int x, int y) {
-// getData()[(y * binNumber) + x] += 1;
-// }
+        // Составьте некоторые координаты для начала и конца.
+        start = new Location(0, height / 2);
+        finish = new Location(width - 1, height / 2);
+    }
 
-// public double getValue(int x, int y) {
-// return getData()[(y * binNumber) + x];
-// }
+    /**
+     * Этот вспомогательный метод проверяет указанные координаты, чтобы увидеть,
+     * находятся ли они
+     * в пределах границ карты. Если координаты не указаны на карте
+     * затем метод выдает исключение <code>IllegalArgumentException</code>.
+     **/
+    private void checkCoords(int x, int y) {
+        if (x < 0 || x > width) {
+            throw new IllegalArgumentException("x must be in range [0, " +
+                    width + "), got " + x);
+        }
 
-// public void logScale() {
-// for (int x = 0; x < binNumber; x++) {
-// for (int y = 0; y < binNumber; y++) {
-// if (getData()[(y * binNumber) + x] > 0) {
-// getData()[(y * binNumber) + x] = Math.log(getData()[(y * binNumber) + x]);
-// }
-// }
-// }
-// }
+        if (y < 0 || y > height) {
+            throw new IllegalArgumentException("y must be in range [0, " +
+                    height + "), got " + y);
+        }
+    }
 
-// public void logScale1() {
-// for (int x = 0; x < binNumber; x++) {
-// for (int y = 0; y < binNumber; y++) {
-// if (getData()[(y * binNumber) + x] > 0) {
-// getData()[(y * binNumber) + x] = Math.log(getData()[(y * binNumber) + x] +
-// 1.0);
-// }
-// }
-// }
-// }
+    /** Возвращает ширину карты. **/
+    public int getWidth() {
+        return width;
+    }
 
-// public void normalizeMax() {
-// double m = max();
-// if (m <= 0) {
-// return;
-// }
-// // normalize by max
-// for (int x = 0; x < binNumber; x++) {
-// for (int y = 0; y < binNumber; y++) {
-// getData()[(y * binNumber) + x] = getData()[(y * binNumber) + x]
-// / m;
-// }
-// }
-// }
+    /** Возвращает высоту карты. **/
+    public int getHeight() {
+        return height;
+    }
 
-// public void normalizeTotal() {
-// double t = total();
-// if (t <= 0) {
-// return;
-// }
-// // normalize by max
-// for (int x = 0; x < binNumber; x++) {
-// for (int y = 0; y < binNumber; y++) {
-// getData()[(y * binNumber) + x] = getData()[(y * binNumber) + x]
-// / t;
-// }
-// }
-// }
+    /**
+     * Возвращает значение true, если указанные координаты содержатся на карте
+     * площадь.
+     **/
+    public boolean contains(int x, int y) {
+        return (x >= 0 && x < width && y >= 0 && y < height);
+    }
 
-// public void binary() {
-// for (int x = 0; x < binNumber; x++) {
-// for (int y = 0; y < binNumber; y++) {
-// if (getData()[(y * binNumber) + x] > 0) {
-// getData()[(y * binNumber) + x] = 1;
-// }
-// }
-// }
-// }
+    /**
+     * Возвращает значение true, если местоположение содержится в области карты.
+     **/
+    public boolean contains(Location loc) {
+        return contains(loc.xCoord, loc.yCoord);
+    }
 
-// public double total() {
-// double total = 0;
+    /** Возвращает сохраненное значение стоимости для указанной ячейки. **/
+    public int getCellValue(int x, int y) {
+        checkCoords(x, y);
+        return cells[x][y];
+    }
 
-// for (int x = 0; x < binNumber; x++) {
-// for (int y = 0; y < binNumber; y++) {
-// total += getData()[(y * binNumber) + x];
-// }
-// }
+    /** Возвращает сохраненное значение стоимости для указанной ячейки. **/
+    public int getCellValue(Location loc) {
+        return getCellValue(loc.xCoord, loc.yCoord);
+    }
 
-// return total;
-// }
+    /** Задает значение стоимости для указанной ячейки. **/
+    public void setCellValue(int x, int y, int value) {
+        checkCoords(x, y);
+        cells[x][y] = value;
+    }
 
-// double max() {
-// double max = 0;
+    /**
+     * Возвращает начальное местоположение для карты. Это где сгенерированный
+     * путь начнется с.
+     **/
+    public Location getStart() {
+        return start;
+    }
 
-// for (int x = 0; x < binNumber; x++) {
-// for (int y = 0; y < binNumber; y++) {
-// if (getData()[(y * binNumber) + x] > max) {
-// max = getData()[(y * binNumber) + x];
-// }
-// }
-// }
+    /**
+     * Задает начальное местоположение для карты. Здесь находится сгенерированный
+     * путь
+     * начнется с.
+     **/
+    public void setStart(Location loc) {
+        if (loc == null)
+            throw new NullPointerException("loc cannot be null");
 
-// return max;
-// }
+        start = loc;
+    }
 
-// double simpleDist(Map2D map) {
-// double dist = 0;
-// for (int x = 0; x < binNumber; x++) {
-// for (int y = 0; y < binNumber; y++) {
-// dist += Math.abs(getData()[(y * binNumber) + x]
-// - map.getData()[(y * map.binNumber) + x]);
-// }
-// }
-// return dist;
-// }
+    /**
+     * Возвращает конечное местоположение для карты. Это где сгенерированный
+     * путь завершится.
+     **/
+    public Location getFinish() {
+        return finish;
+    }
 
-// private Signature getEmdSignature() {
-// int n = 0;
-// for (int x = 0; x < binNumber; x++) {
-// for (int y = 0; y < binNumber; y++) {
-// if (getValue(x, y) > 0) {
-// n++;
-// }
-// }
-// }
+    /**
+     * Задает конечное местоположение для карты. Здесь находится сгенерированный
+     * путь
+     * завершится.
+     **/
+    public void setFinish(Location loc) {
+        if (loc == null)
+            throw new NullPointerException("loc cannot be null");
 
-// Feature2D[] features = new Feature2D[n];
-// double[] weights = new double[n];
-
-// int i = 0;
-// for (int x = 0; x < binNumber; x++) {
-// for (int y = 0; y < binNumber; y++) {
-// double val = getValue(x, y);
-// if (val > 0) {
-// Feature2D f = new Feature2D(x, y);
-// features[i] = f;
-// weights[i] = val;
-// i++;
-// }
-// }
-// }
-
-// Signature signature = new Signature();
-// signature.setNumberOfFeatures(n);
-// signature.setFeatures(features);
-// signature.setWeights(weights);
-
-// return signature;
-// }
-
-// public double emdDistance(Map2D map) {
-// double infinity = Double.MAX_VALUE;
-
-// if ((total() <= 0) || (map.total() <= 0)) {
-// return infinity;
-// }
-
-// Signature sig1 = getEmdSignature();
-// Signature sig2 = map.getEmdSignature();
-
-// return JFastEMD.distance(sig1, sig2, -1);
-// }
-
-// public String cArray() {
-// String str = "{";
-// for (int i = 0; i < binNumber * binNumber; i++) {
-// if (i > 0) {
-// str += ", ";
-// }
-// str += "" + data[i];
-// }
-// str += "}";
-// return str;
-// }
-
-// @Override
-// public String toString() {
-// String str = "";
-// for (int y = 0; y < binNumber; y++) {
-// for (int x = 0; x < binNumber; x++) {
-// str += getValue(x, y) + "\t";
-// }
-// str += "\n";
-// }
-// return str;
-// }
-
-// double[] getData() {
-// return data;
-// }
-
-// void setData(double[] data) {
-// this.data = data;
-// }
-
-// int getBinNumber() {
-// return binNumber;
-// }
-
-// void setBinNumber(int binNumber) {
-// this.binNumber = binNumber;
-// }
-
-// double getMinValHor() {
-// return minValHor;
-// }
-
-// void setMinValHor(double minValHor) {
-// this.minValHor = minValHor;
-// }
-
-// double getMaxValHor() {
-// return maxValHor;
-// }
-
-// void setMaxValHor(double maxValHor) {
-// this.maxValHor = maxValHor;
-// }
-
-// double getMinValVer() {
-// return minValVer;
-// }
-
-// void setMinValVer(double minValVer) {
-// this.minValVer = minValVer;
-// }
-
-// double getMaxValVer() {
-// return maxValVer;
-// }
-
-// void setMaxValVer(double maxValVer) {
-// this.maxValVer = maxValVer;
-// }
-// }
+        finish = loc;
+    }
+}

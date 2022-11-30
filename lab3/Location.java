@@ -1,48 +1,41 @@
-// package lab3;
 
-// public class Location {
-// private String name;
-// private double longitude;
-// private double latitude;
+import java.util.Objects;
 
-// // create and initialize a point with given name and
-// // (latitude, longitude) specified in degrees
-// public Location(String name, double latitude, double longitude) {
-// this.name = name;
-// this.latitude = latitude;
-// this.longitude = longitude;
-// }
+/**
+ * Этот класс представляет определенное местоположение на 2D-карте. Координаты
+ * являются
+ * целочисленные значения.
+ **/
+public class Location {
+    /** X координата этого местоположения. **/
+    public int xCoord;
 
-// // return distance between this location and that location
-// // measured in statute miles
-// public double distanceTo(Location that) {
-// double STATUTE_MILES_PER_NAUTICAL_MILE = 1.15077945;
-// double lat1 = Math.toRadians(this.latitude);
-// double lon1 = Math.toRadians(this.longitude);
-// double lat2 = Math.toRadians(that.latitude);
-// double lon2 = Math.toRadians(that.longitude);
+    /** Y координата этого местоположения. **/
+    public int yCoord;
 
-// // great circle distance in radians, using law of cosines formula
-// double angle = Math.acos(Math.sin(lat1) * Math.sin(lat2)
-// + Math.cos(lat1) * Math.cos(lat2) * Math.cos(lon1 - lon2));
+    /** Создает новое местоположение с указанными целочисленными координатами. **/
+    public Location(int x, int y) {
+        xCoord = x;
+        yCoord = y;
+    }
 
-// // each degree on a great circle of Earth is 60 nautical miles
-// double nauticalMiles = 60 * Math.toDegrees(angle);
-// double statuteMiles = STATUTE_MILES_PER_NAUTICAL_MILE * nauticalMiles;
-// return statuteMiles;
-// }
+    /** Создает новое местоположение с координатами (0, 0). **/
+    public Location() {
+        this(0, 0);
+    }
 
-// // return string representation of this point
-// public String toString() {
-// return name + " (" + latitude + ", " + longitude + ")";
-// }
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (!(obj instanceof Location)) {
+            return false;
+        }
+        Location location = (Location) obj;
+        return xCoord == location.xCoord && yCoord == location.yCoord;
+    }
 
-// // test client
-// public static void main(String[] args) {
-// Location loc1 = new Location("PRINCETON_NJ", 40.366633, 74.640832);
-// Location loc2 = new Location("ITHACA_NY", 42.443087, 76.488707);
-// double distance = loc1.distanceTo(loc2);
-// StdOut.printf("%6.3f miles from\n", distance);
-// StdOut.println(loc1 + " to " + loc2);
-// }
-// }
+    public int hashCode() {
+        return Objects.hash(xCoord, yCoord);
+    }
+}
